@@ -1,0 +1,3 @@
+class Coupon(object):
+    pass
+

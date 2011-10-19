@@ -1,0 +1,2 @@
+class Invoice(object):
+    pass
