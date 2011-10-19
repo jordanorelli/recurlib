@@ -12,8 +12,12 @@ class BaseModel(object):
             self.__class__ = self.managed_class
 
     def to_xml(self):
-        elem = Element(self.__class__._item_tag_name)
+        elem = Element(self.__class__.item_tag)
         for k,v in self.__dict__.items():
+            if k not in self.__class__.known_attributes:
+                continue
+            if not v:
+                continue
             child = Element(k)
             child.text = str(v)
             elem.append(child)

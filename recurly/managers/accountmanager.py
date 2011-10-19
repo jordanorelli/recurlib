@@ -8,6 +8,7 @@ class AccountManager(BaseManager):
     automatically when you create a Recurly API client and is exposed
     through a client instance's client.accounts member.
     """
+    endpoint = '/accounts'
 
     @autoparse
     def all(self, page=None):
@@ -26,10 +27,6 @@ class AccountManager(BaseManager):
     @autoparse
     def non_subscribers(self):
         return self._client.get('/accounts?show=non_subscribers')
-
-    @autoparse
-    def create(self, account):
-        return self._client.post('/accounts', data=account.__dict__)
 
     @autoparse
     def get(self, account_code):

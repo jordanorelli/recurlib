@@ -10,6 +10,7 @@ class Account(BaseModel):
     item_tag = 'account'
     collection_tag = 'accounts'
     known_attributes = (
+        'id',
         'account_code',
         'username',
         'email',
@@ -28,6 +29,13 @@ class Account(BaseModel):
         return "[Recurly Account: %r]" % self.account_code
 
 class ManagedAccount(Account):
+    known_attributes = Account.known_attributes + (
+        'closed',
+        'hosted_login_token',
+        'created_at',
+        'state',
+    )
+
     def get_charges(self):
         return self._client.charges.get(self.account_code)
 

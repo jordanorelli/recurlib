@@ -1,10 +1,13 @@
+from inspect import getmembers, isclass
 from recurly import models
 from warnings import warn
 from xml.etree import cElementTree
-from inspect import getmembers, isclass
+from dateutil.parser import parse as parse_date
 
 _known_types = {
+    'boolean': bool,
     'integer': int,
+    'datetime': parse_date,
 }
 
 _item_tags = {}
@@ -26,7 +29,7 @@ def parse_item(elem, client=None):
                 val = _known_types[child.attrib['type']](child.text)
             else:
                 warn("Unkown type '%s' specified in xml tag '%s'"
-                     % child.attrib['type'])
+                     % (child.attrib['type'], elem.tag))
                 val = child.text
         else:
             val = child.text
