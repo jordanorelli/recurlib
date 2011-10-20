@@ -1,6 +1,5 @@
 import functools
 import string
-from recurly.serialization import parse_xml
 
 def trace(fn):
     @functools.wraps(fn)

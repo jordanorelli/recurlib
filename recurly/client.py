@@ -4,7 +4,6 @@ from recurly.exceptions import *
 from recurly.managers import AccountManager, ChargeManager
 from requests import session
 from requests.models import AuthObject
-from xml.etree.cElementTree import Element
 
 class Client():
     """ A Recurly REST API client. """
@@ -68,7 +67,7 @@ class Client():
         return self._session.delete(self.url + url, *args, **kwargs)
 
     def generate_signature(self, claim, args, timestamp=None):
-        return verification.generate_signature(claim, args, self.private_key)
+        return verification.generate_signature(claim, args, self.private_key, timestamp)
 
     def verify_params(self, claim, args):
         return verification.verify_params(claim, args, self.private_key)

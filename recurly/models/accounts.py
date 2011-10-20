@@ -1,4 +1,3 @@
-from functools import partial
 from recurly.models.base import BaseModel
 
 class Account(BaseModel):

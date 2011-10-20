@@ -2,7 +2,6 @@ from hashlib import sha1
 import hmac
 import re
 import time
-import functools
 
 def digest_data(data):
     """

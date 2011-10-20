@@ -12,7 +12,7 @@ setup(
     description = ("A client for interacting with Recurly, a subscription \
                    billing service."),
     license = "MIT",
-    keywords = "subscriptions billing payments ecommerce"
+    keywords = "subscriptions billing payments ecommerce",
     packages = ['recurly', 'tests'],
     long_description = read('README'),
     classifiers = [
