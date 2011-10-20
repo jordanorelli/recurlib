@@ -2,6 +2,10 @@ import functools
 import string
 
 def trace(fn):
+    """
+    this can be used to decorate python-requests calls in order to trace the
+    requests and responses being made.  It can be handy during development
+    """
     @functools.wraps(fn)
     def wraps(self, url, *args, **kwargs):
         print "%s %s" % (string.upper(fn.func_name), url)
@@ -10,16 +14,4 @@ def trace(fn):
         for k, v in kwargs.items():
             print "%r: %r" % (k, v)
         return fn(self, url, *args, **kwargs)
-    return wraps
-
-def bubble(fn):
-    """
-    Wraps python-requests calls to cause them to raise errors as they occur.
-    """
-    @functools.wraps(fn)
-    def wraps(self, url, *args, **kwargs):
-        response = fn(self, url, *args, **kwargs)
-        if not response:
-            raise response.error
-        return response
     return wraps

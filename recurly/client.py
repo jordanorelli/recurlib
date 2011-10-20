@@ -4,6 +4,7 @@ from recurly.exceptions import *
 from recurly.managers import AccountManager, ChargeManager
 from requests import session
 from requests.models import AuthObject
+from base64 import standard_b64encode as base64encode
 
 class Client():
     """ A Recurly REST API client. """
@@ -16,18 +17,17 @@ class Client():
         """
         self.url = 'https://%s.recurly.com' % subdomain
         self.private_key = private_key
+        authstring = 'Basic %s' % base64encode('%s:' % api_key)
         self._session = session(
-            auth = AuthObject(api_key, ''),
-            headers = {
+            headers={
                 'Accept': 'application/xml',
                 'Content-Type': 'application/xml; charset=utf-8',
-                'User-Agent': "Jordan Orelli's Python Client",
+                'User-Agent': "recurlib Python Client",
+                'Authorization': authstring,
             })
         self.accounts = AccountManager(self)
         self.charges = ChargeManager(self)
 
-    @trace
-    @bubble
     def get(self, url, *args, **kwargs):
         """
         This is a proxy HTTP GET method on a requests.session object.
@@ -36,8 +36,6 @@ class Client():
         """
         return self._session.get(self.url + url, *args, **kwargs)
 
-    @trace
-    @bubble
     def post(self, url, *args, **kwargs):
         """
         This is a proxy HTTP POST method on a requests.session object.
@@ -46,8 +44,6 @@ class Client():
         """
         return self._session.post(self.url + url, *args, **kwargs)
 
-    @trace
-    @bubble
     def put(self, url, *args, **kwargs):
         """
         This is a proxy HTTP PUT method on a requests.session object.
@@ -56,8 +52,6 @@ class Client():
         """
         return self._session.put(self.url + url, *args, **kwargs)
 
-    @trace
-    @bubble
     def delete(self, url, *args, **kwargs):
         """
         This is a proxy HTTP DELETE method on a requests.session object.

@@ -25,9 +25,6 @@ def autoparse(fn):
     def wraps(self, *args, **kwargs):
         response = fn(self, *args, **kwargs)
         if not response:
-            print repr(self)
-            print repr(*args)
-            print repr(**kwargs)
             raise response.error
         if hasattr(self, '_client'):
             return parse_xml(response.content, self._client)
