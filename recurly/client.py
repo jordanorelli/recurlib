@@ -1,10 +1,7 @@
+from base64 import standard_b64encode as base64encode
 from recurly import verification
-from recurly.decorators import bubble, trace
-from recurly.exceptions import *
 from recurly.managers import AccountManager, ChargeManager
 from requests import session
-from requests.models import AuthObject
-from base64 import standard_b64encode as base64encode
 
 class Client():
     """ A Recurly REST API client. """
@@ -22,7 +19,7 @@ class Client():
             headers={
                 'Accept': 'application/xml',
                 'Content-Type': 'application/xml; charset=utf-8',
-                'User-Agent': "recurlib Python Client",
+                'User-Agent': 'recurlib Python Client',
                 'Authorization': authstring,
             })
         self.accounts = AccountManager(self)

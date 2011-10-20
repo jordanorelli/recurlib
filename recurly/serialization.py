@@ -1,8 +1,9 @@
+from dateutil.parser import parse as parse_date
 from inspect import getmembers, isclass
 from recurly import models
+from recurly.exceptions import exception_class_map, RecurlyException
 from warnings import warn
 from xml.etree import cElementTree
-from dateutil.parser import parse as parse_date
 
 _known_types = {
     'boolean': bool,
@@ -41,6 +42,33 @@ def parse_item(elem, client=None):
         setattr(item, child.tag, val)
     return item
 
+def parse_errors(response):
+    """
+    Parses error info from raw response objects.  The error itself isn't
+    raised, it is just constructed.
+    """
+    try:
+        cls = exception_class_map.get(response.status_code, RecurlyException)
+        errortexts = []
+        if response.content:
+            elem = cElementTree.fromstring(response.content)
+            if elem.tag != 'errors':
+                raise RecurlyException("Expected xml root tag of <errors>, \
+                                       received unkown tag '%s'" % elem.tag)
+            for child in list(elem):
+                if child.tag != 'error':
+                    raise RecurlyException("Expected xml child tag of \
+                                           <error>, received unkown tag \
+                                           '%s'" % child.tag)
+                errortexts.append(child.text)
+        return cls('.'.join(errortexts))
+
+    except Exception as omfg:
+    # I pray that this block never executes.
+        e = RecurlyException("Error parsing Recurly error xml.  Ugh.", omfg)
+    e.args += (response,)
+    return e
+
 def parse_collection(elem, client=None):
     items = []
     cls = _collection_tags[elem.tag]
@@ -63,8 +91,10 @@ def parse_element(elem, client=None):
             return parse_collection(elem, client)
     return parse_item(elem, client)
 
-def parse_xml(xml, client=None):
-    elem = cElementTree.fromstring(xml)
+def parse_xml(response, client=None):
+    elem = cElementTree.fromstring(response.content)
+    if elem.tag == 'errors':
+        raise parse_errors(response)
     return parse_element(elem, client)
 
 class ResultsPage(object):
@@ -91,4 +121,6 @@ class ResultsPage(object):
         return self.items.__len__()
 
     def next_page(self):
-        return self.caller(page=self.current_page+1)
+        page = self.caller(page=self.current_page+1)
+        page.caller = self.caller
+        return page

@@ -15,3 +15,4 @@ def trace(fn):
             print "%r: %r" % (k, v)
         return fn(self, url, *args, **kwargs)
     return wraps
+

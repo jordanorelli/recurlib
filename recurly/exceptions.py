@@ -79,20 +79,25 @@ class RecurlyValidationException(RecurlyException):
     """ Raise when encountering errors in validation. """
     pass
 
-def get_exception(response):
+class RecurlyTransactionException(RecurlyException):
+    """ <error code=""> tags make these. """
+    pass
+
+class RecurlyErrorParsingException(Exception):
     """
-    Takes a python-requests response object and casts it to the appropraite
-    RecurlyException object.
+    If this exception ever gets raised, shit is really, really fucked up.
     """
-    exception_class = {
-        400: RecurlyBadRequestException,
-        401: RecurlyUnauthorizedException,
-        402: RecurlyAccountDeliquentException,
-        403: RecurlyForbiddenException,
-        404: RecurlyNotFoundException,
-        412: RecurlyPreconditionFailedException,
-        422: RecurlyUnprocessableEntityException,
-        500: RecurlyInternalServerErrorException,
-        502: RecurlyGatewayErrorException,
-        503: RecurlyUnavailableException,
-    }.get(response.status_code, RecurlyException)
+    pass
+
+exception_class_map = {
+    400: RecurlyBadRequestException,
+    401: RecurlyUnauthorizedException,
+    402: RecurlyAccountDeliquentException,
+    403: RecurlyForbiddenException,
+    404: RecurlyNotFoundException,
+    412: RecurlyPreconditionFailedException,
+    422: RecurlyUnprocessableEntityException,
+    500: RecurlyInternalServerErrorException,
+    502: RecurlyGatewayErrorException,
+    503: RecurlyUnavailableException,
+}

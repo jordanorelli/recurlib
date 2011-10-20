@@ -8,6 +8,7 @@ class Account(BaseModel):
     """
     item_tag = 'account'
     collection_tag = 'accounts'
+    pk_attrib = 'account_code'
     known_attributes = (
         'id',
         'account_code',
