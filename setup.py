@@ -13,10 +13,7 @@ setup(
                    billing service."),
     license = "MIT",
     keywords = "subscriptions billing payments ecommerce",
-    packages = ['recurly', 'tests'],
-    long_description = read('README'),
-    classifiers = [
-        "Development Status :: 3 - Alpha",
-        "License :: OSI Approved :: MIT License",
-    ],
+    url = "https://github.com/jordanorelli/recurlib",
+    packages = ['recurly', 'recurly.managers', 'recurly.models', 'tests'],
+    install_requires = ['python-dateutil < 2.0', 'requests'],
 )
