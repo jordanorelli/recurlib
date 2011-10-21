@@ -50,7 +50,7 @@ def parse_errors(response):
     try:
         cls = exception_class_map.get(response.status_code, RecurlyException)
         errortexts = []
-        if response.content:
+        if response.content and not response.content.isspace():
             elem = cElementTree.fromstring(response.content)
             if elem.tag != 'errors':
                 raise RecurlyException("Expected xml root tag of <errors>, \
@@ -61,7 +61,7 @@ def parse_errors(response):
                                            <error>, received unkown tag \
                                            '%s'" % child.tag)
                 errortexts.append(child.text)
-        return cls('.'.join(errortexts))
+        return cls('.'.join(errortexts) or cls.__doc__)
 
     except Exception as omfg:
     # I pray that this block never executes.
