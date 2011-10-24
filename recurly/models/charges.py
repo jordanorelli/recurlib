@@ -18,9 +18,13 @@ class Charge(BaseModel):
     known_attributes = (
         'id',
         'account_code',
+        'quantity',
+        'unit_amount_in_cents', #...what is this for?
         'amount_in_cents',
+        'currency',
         'start_date',
         'end_date',
+        'invoice_number',
         'description',
         'created_at',
     )

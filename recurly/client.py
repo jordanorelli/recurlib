@@ -1,6 +1,6 @@
 from base64 import standard_b64encode as base64encode
 from recurly import verification
-from recurly.managers import AccountManager, ChargeManager
+from recurly.managers import AccountManager, ChargeManager, InvoiceManager
 from requests import session
 
 class Client():
@@ -24,6 +24,7 @@ class Client():
             })
         self.accounts = AccountManager(self)
         self.charges = ChargeManager(self)
+        self.invoices = InvoiceManager(self)
 
     def get(self, url, *args, **kwargs):
         """

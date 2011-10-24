@@ -1,4 +1,4 @@
-from accounts import *
+from accounts import Account, ManagedAccount
 from charges import *
 from coupons import *
 from credits import *

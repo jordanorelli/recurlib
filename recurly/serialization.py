@@ -1,6 +1,6 @@
 from dateutil.parser import parse as parse_date
 from inspect import getmembers, isclass
-from recurly import models
+from recurly import models, xmldict
 from recurly.exceptions import exception_class_map, RecurlyException
 from warnings import warn
 from xml.etree import cElementTree
@@ -21,11 +21,29 @@ for label, cls in model_classes:
     if hasattr(cls, 'collection_tag'):
         _collection_tags[cls.collection_tag] = cls
 
+def _get_model_class(class_name):
+    """
+    Gets a class object by name.  Assumed to be within the recurly.models
+    module.
+    """
+    return getmembers(models, lambda x: isclass(x)
+                      and x.__name__ == class_name)[0][1]
+
 def parse_item(elem, client=None):
-    item = _item_tags[elem.tag](client=client)
+    item_class = _item_tags[elem.tag]
+    if hasattr(item_class, 'managed_class'):
+        item_class = _get_model_class(item_class.managed_class)
+    item = item_class(client=client)
 
     for child in list(elem):
-        if 'type' in child.attrib:
+
+        if child.tag in _item_tags:
+            val = parse_item(child)
+
+        elif child.tag in _collection_tags:
+            val = parse_collection(child)
+
+        elif 'type' in child.attrib and child.text:
             if child.attrib['type'] in _known_types:
                 val = _known_types[child.attrib['type']](child.text)
             else:
@@ -35,7 +53,7 @@ def parse_item(elem, client=None):
         else:
             val = child.text
 
-        if not hasattr(item, child.tag):
+        if child.tag not in item_class.known_attributes:
             warn("Setting unknown attribute '%s' to '%r' on instance of '%s'"
                  % (child.tag, val, item.__class__.__name__))
 

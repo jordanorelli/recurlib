@@ -125,8 +125,5 @@ def verify_params(claim, args, private_key):
     if age > 3600 or age < -3600:
         raise ValueError("signature is too old or too new")
 
-    print 'signature: ' + signature
-    print repr(args)
     expected_signature = generate_signature(claim, args, private_key, timestamp)
-    print 'expected signature: ' + expected_signature
     return signature == expected_signature

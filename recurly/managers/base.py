@@ -9,7 +9,7 @@ class BaseManager(object):
 
     @autoparse
     def get(self, pk):
-        return self.client.get("%s/%s" % (self.endpoint, pk))
+        return self._client.get("%s/%s" % (self.endpoint, pk))
 
     @autoparse
     def create(self, obj):

@@ -1,27 +1,26 @@
-from xml.etree import cElementTree
+from recurly import xmldict
 
 class BaseModel(object):
     known_attributes = ()
     pk_attrib = 'id'
 
+    def _filter_dict(self, dct):
+        """Filters a dictionary, removing all items in the dictionary whose
+        keys are not listed in known_attributes."""
+        return dict((k, v) for k, v in dct.items()
+                    if k in self.__class__.known_attributes)
+
     def __init__(self, *args, **kwargs):
-        for attrib in self.__class__.known_attributes:
-            setattr(self, attrib, kwargs.get(attrib, None))
-        self._client = kwargs.get('client', None)
-        if hasattr(self, 'managed_class') and self._client:
-            self.__class__ = self.managed_class
+        dct = self._filter_dict(kwargs)
+        for k, v in dct.items():
+            setattr(self, k, v)
+        if 'client' in kwargs:
+            self._client = kwargs['client']
 
     def to_xml(self):
-        elem = cElementTree.Element(self.__class__.item_tag)
-        for k, v in self.__dict__.items():
-            if k not in self.__class__.known_attributes:
-                continue
-            if not v:
-                continue
-            child = cElementTree.Element(k)
-            child.text = str(v)
-            elem.append(child)
-        return cElementTree.tostring(elem)
+        from recurly.serialization import xmldict
+        dct = self._filter_dict(self.__dict__)
+        return xmldict(self.__class__.item_tag, dct)
 
     @property
     def pk(self):
