@@ -4,7 +4,7 @@ from random import choice
 from string import letters, digits
 from credentials import credentials as creds
 from recurly.client import Client
-from recurly.models import Account, ManagedAccount
+from recurly.models import Account, ManagedAccount, Charge, Invoice
 from recurly.exceptions import RecurlyNotFoundException, RecurlyException
 
 def randomstring(length):
@@ -40,21 +40,51 @@ class AccountTest(unittest.TestCase):
         created = self.client.accounts.create(account)
         self.assertTrue(isinstance(created, ManagedAccount))
 
-        # check its attributes
+        # check the accounts attributes
         for k, v in self.account_data.items():
             self.assertEqual(getattr(created, k), v)
 
-        # make sure it can be retrieved
+        # make sure you can retrieve the account
         fetched = self.client.accounts.get(
             self.account_data['account_code'],
         )
         self.assertTrue(isinstance(fetched, ManagedAccount))
 
-        # update it
+        # update some account details
         dct = {'username': randomstring(8)}
         self.assertTrue(self.client.accounts.update(fetched, dct))
 
-        # delete it
+        # we can get a list of charges.  An empty list shold process.
+        charges = fetched.get_charges()
+        self.assertEqual(charges, [])
+
+        # charge the account
+        charge = fetched.charge(1986, "This charge was created in a unit test yay.")
+        self.assertTrue(isinstance(charge, Charge))
+
+        # that charge should appear as pending
+        pending = fetched.pending_charges()
+        self.assertTrue(charge.id in [c.id for c in pending])
+        # note: get_charges only returns 20 charges, but does not return a
+        # ResultPage instance due to a bug in the Recurly API; the API
+        # returns no paging data.
+
+        # shouldn't be able to register a negative charge.
+        self.assertRaises(
+            ValueError,
+            fetched.charge,
+            -200,
+            "This should fail.",
+        )
+        # note: this is not actually handled by Recurly, so if you try to
+        # do a raw post for this action Recurly will simply process a
+        # negative amount as a positive amount without telling you.
+
+        # invoice the account.
+        invoice = fetched.invoice()
+        self.assertTrue(isinstance(invoice, Invoice))
+
+        # delete the account
         self.assertTrue(self.client.accounts.delete(fetched))
 
         # can't delete it again.

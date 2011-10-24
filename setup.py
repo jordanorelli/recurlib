@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "recurlib",
-    version = "0.0.5",
+    version = "0.0.7",
     author = "Jordan Orelli",
     author_email = "jordanorelli@gmail.com",
     description = ("A client for interacting with Recurly, a subscription \
